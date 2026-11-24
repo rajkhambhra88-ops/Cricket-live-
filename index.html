@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CricFy TV - Live Sports & Entertainment</title>
+<meta name="description" content="Watch live sports and TV channels on Mobile, Firestick and Smart TV">
+<link rel="manifest" href="data:application/json,{%22name%22:%22CricFy%20TV%22,%22short_name%22:%22CricFy%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%230a0e1a%22,%22theme_color%22:%22%23ff4757%22}">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #0a0e1a;
+    --bg-2: #121829;
+    --card: #1a2236;
+    --card-hover: #232d47;
+    --accent: #ff4757;
+    --accent-2: #ff6b81;
+    --gold: #ffd166;
+    --text: #e8edf5;
+    --text-dim: #8892b0;
+    --green: #2ecc71;
+    --radius: 14px;
+  }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* ---------- HEADER ---------- */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,14,26,.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.35rem; font-weight: 800; letter-spacing: -.5px;
+  }
+  .logo-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center; font-size: 20px;
+    box-shadow: 0 4px 16px rgba(255,71,87,.4);
+  }
+  .logo span { color: var(--accent); }
+  .search-box {
+    flex: 1; max-width: 380px;
+    position: relative;
+  }
+  .search-box input {
+    width: 100%; padding: 11px 16px 11px 42px;
+    background: var(--card); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 30px; color: var(--text); font-size: .92rem;
+    outline: none; transition: .25s;
+  }
+  .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,71,87,.15); }
+  .search-box::before {
+    content: '🔍'; position: absolute; left: 15px; top: 50%;
+    transform: translateY(-50%); font-size: 15px; opacity: .6;
+  }
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,71,87,.15); border: 1px solid rgba(255,71,87,.4);
+    padding: 7px 14px; border-radius: 30px;
+    font-size: .78rem; font-weight: 700; color: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  .live-badge::before {
+    content: ''; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); animation: blink 1.2s infinite;
+  }
+  @keyframes blink { 50% { opacity: .25; } }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(255,71,87,.08); } }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    margin: 24px 20px 0;
+    padding: 34px 30px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #1e2740 0%, #2a1f3d 55%, #3d1e2b 100%);
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; right: -60px; top: -60px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,71,87,.35), transparent 70%);
+  }
+  .hero h1 { font-size: clamp(1.5rem, 3.5vw, 2.3rem); margin-bottom: 8px; }
+  .hero p { color: var(--text-dim); max-width: 560px; font-size: .95rem; line-height: 1.55; }
+  .hero-cta {
+    margin-top: 18px; display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff; text-decoration: none; font-weight: 700;
+    padding: 11px 24px; border-radius: 30px; font-size: .92rem;
+    box-shadow: 0 6px 22px rgba(255,71,87,.4); transition: .2s;
+  }
+  .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 9px 28px rgba(255,71,87,.55); }
+
+  /* ---------- CATEGORY CHIPS ---------- */
+  .chips {
+    display: flex; gap: 10px; padding: 22px 20px 6px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0; padding: 9px 20px; border-radius: 30px;
+    background: var(--card); border: 1px solid rgba(255,255,255,.08);
+    color: var(--text-dim); font-size: .86rem; font-weight: 600;
+    cursor: pointer; transition: .2s; user-select: none;
+  }
+  .chip:hover { color: var(--text); background: var(--card-hover); }
+  .chip.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 4px 16px rgba(255,71,87,.35);
+  }
+
+  /* ---------- GRID ---------- */
+  .section-title {
+    padding: 22px 20px 12px; font-size: 1.15rem; font-weight: 700;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .section-title::before {
+    content: ''; width: 4px; height: 20px; border-radius: 4px;
+    background: linear-gradient(var(--accent), var(--accent-2));
+  }
+  .grid {
+    display: grid; gap: 16px; padding: 0 20px 40px;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  }
+  .card {
+    background: var(--card); border-radius: var(--radius);
+    overflow: hidden; cursor: pointer; position: relative;
+    border: 1px solid rgba(255,255,255,.06);
+    transition: .25s cubic-bezier(.4,0,.2,1);
+  }
+  .card:hover { transform: translateY(-5px); border-color: rgba(255,71,87,.45); box-shadow: 0 12px 32px rgba(0,0,0,.45); }
+  .card-thumb {
+    aspect-ratio: 16/10; display: grid; place-items: center;
+    font-size: 2.6rem; position: relative;
+    background: linear-gradient(135deg, #232d47, #1a2236);
+  }
+  .card:hover .card-thumb { filter: brightness(1.15); }
+  .card-thumb .play-overlay {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    background: rgba(0,0,0,.35); opacity: 0; transition: .25s;
+  }
+  .card:hover .play-overlay { opacity: 1; }
+  .play-overlay span {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255,71,87,.95); display: grid; place-items: center;
+    font-size: 20px; color: #fff; padding-left: 4px;
+  }
+  .card-live {
+    position: absolute; top: 10px; left: 10px;
+    background: var(--accent); color: #fff; font-size: .65rem; font-weight: 800;
+    padding: 3px 9px; border-radius: 6px; letter-spacing: .5px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .card-live::before { content:''; width:5px; height:5px; background:#fff; border-radius:50%; animation: blink 1.2s infinite; }
+  .card-info { padding: 12px 14px 14px; }
+  .card-info h3 { font-size: .95rem; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-info p { font-size: .78rem; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
+  .card-info .cat-tag {
+    background: rgba(255,71,87,.12); color: var(--accent);
+    padding: 2px 8px; border-radius: 5px; font-size: .68rem; font-weight: 700;
+  }
+
+  /* ---------- MODAL PLAYER ---------- */
+  .modal {
+    position: fixed; inset: 0; z-index: 999;
+    background: rgba(0,0,0,.92); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    padding: 16px; animation: fadeIn .25s;
+  }
+  .modal.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } }
+  .player-box {
+    width: 100%; max-width: 1000px;
+    background: var(--bg-2); border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,.1);
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+  }
+  .player-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .player-head h3 { font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+  .close-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,.08); color: var(--text);
+    font-size: 18px; cursor: pointer; transition: .2s; flex-shrink: 0;
+  }
+  .close-btn:hover { background: var(--accent); }
+  .video-wrap { aspect-ratio: 16/9; background: #000; }
+  .video-wrap video { width: 100%; height: 100%; display: block; }
+  .player-foot { padding: 12px 18px; color: var(--text-dim); font-size: .8rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    text-align: center; padding: 28px 20px 40px;
+    color: var(--text-dim); font-size: .82rem; line-height: 1.7;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  .legal-note { max-width: 720px; margin: 8px auto 0; font-size: .75rem; opacity: .7; }
+
+  /* ---------- EMPTY STATE ---------- */
+  .empty { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-dim); }
+  .empty div { font-size: 3rem; margin-bottom: 10px; }
+
+  /* ---------- SCROLLBAR ---------- */
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--card-hover); border-radius: 10px; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 640px) {
+    header { padding: 12px 14px; flex-wrap: wrap; }
+    .search-box { order: 3; flex-basis: 100%; max-width: 100%; }
+    .hero { margin: 16px 14px 0; padding: 24px 20px; }
+    .chips { padding: 18px 14px 4px; }
+    .grid { padding: 0 14px 30px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .card-thumb { font-size: 2rem; }
+    .section-title { padding: 18px 14px 10px; }
+    .live-badge { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">📺</div>
+    Cric<span>Fy</span>
+  </div>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search channels, sports...">
+  </div>
+  <div class="live-badge">LIVE NOW</div>
+</header>
+
+<section class="hero">
+  <h1>⚡ Live Sports & TV, Zero Buffering</h1>
+  <p>Watch cricket, football, news & entertainment channels live on Mobile, Firestick & Android Smart TV. Fast, smooth, and always free.</p>
+  <a href="#channels" class="hero-cta">▶ Start Watching</a>
+</section>
+
+<div class="chips" id="chips"></div>
+
+<div class="section-title" id="channels">All Channels</div>
+<div class="grid" id="grid"></div>
+
+<!-- PLAYER MODAL -->
+<div class="modal" id="modal">
+  <div class="player-box">
+    <div class="player-head">
+      <h3 id="playerTitle">📺 Channel</h3>
+      <button class="close-btn" onclick="closePlayer()">✕</button>
+    </div>
+    <div class="video-wrap">
+      <video id="video" controls autoplay playsinline></video>
+    </div>
+    <div class="player-foot">
+      <span id="playerCat">Category</span>
+      <span>🔴 Live Stream</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div>© 2024 CricFy TV — Built with ❤️ for entertainment</div>
+  <div class="legal-note">
+    ⚠️ This app streams only publicly available free-to-air (FTA) / legal test streams.
+    We do not host or distribute any copyrighted content. All trademarks belong to their respective owners.
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   CHANNEL DATA
+   ---------------------------------------------------------
+   Yahan aap apne LEGAL stream URLs add karein.
+   - HLS (.m3u8) links best work karte hain (native + hls.js)
+   - MP4 links bhi chalenge
+   - Demo ke liye public test streams diye gaye hain
+   ========================================================= */
+const CHANNELS = [
+  // ---- SPORTS / TEST STREAMS (legal public demo) ----
+  { name: "Sports Test HD", cat: "Sports", icon: "🏏", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+  { name: "Football Live Demo", cat: "Sports", icon: "⚽", url: "https://test-streams.mux.dev/pts_shift/master.m3u8" },
+  { name: "Cricket Highlights", cat: "Sports", icon: "🏏", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+  { name: "Tennis Court HD", cat: "Sports", icon: "🎾", url: "https://test-streams.mux.dev/pts_shift/master.m3u8" },
+
+  // ---- NEWS ----
+  { name: "News 24 Live", cat: "News", icon: "📰", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+  { name: "World News HD", cat: "News", icon: "🌍", url: "https://test-streams.mux.dev/pts_shift/master.m3u8" },
+  { name: "Business Today", cat: "News", icon: "💼", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+
+  // ---- ENTERTAINMENT ----
+  { name: "Movie Max", cat: "Entertainment", icon: "🎬", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+  { name: "Music Beats", cat: "Entertainment", icon: "🎵", url: "https://test-streams.mux.dev/pts_shift/master.m3u8" },
+  { name: "Comedy Club", cat: "Entertainment", icon: "😂", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+
+  // ---- KIDS ----
+  { name: "Toon World", cat: "Kids", icon: "🧸", url: "https://test-streams.mux.dev/pts_shift/master.m3u8" },
+  { name: "Cartoon Fun", cat: "Kids", icon: "🎨", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+
+  // ---- BANGLADESH (FTA legal examples - replace with your own) ----
+  { name: "BD Channel 1", cat: "Bangladesh", icon: "🇧🇩", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+  { name: "BD Channel 2", cat: "Bangladesh", icon: "🇧🇩", url: "https://test-streams.mux.dev/pts_shift/master.m3u8" },
+
+  // ---- INDIA ----
+  { name: "IN Channel 1", cat: "India", icon: "🇮🇳", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+  { name: "IN Channel 2", cat: "India", icon: "🇮🇳", url: "https://test-streams.mux.dev/pts_shift/master.m3u8" },
+
+  // ---- PAKISTAN ----
+  { name: "PK Channel 1", cat: "Pakistan", icon: "🇵🇰", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+  { name: "PK Channel 2", cat: "Pakistan", icon: "🇵🇰", url: "https://test-streams.mux.dev/pts_shift/master.m3u8" },
+];
+
+/* ============ STATE ============ */
+let activeCat = "All";
+let searchTerm = "";
+
+/* ============ HLS.js loader (for .m3u8 on Chrome/Firefox) ============ */
+let hlsScriptLoaded = false;
+function loadHls(callback) {
+  if (window.Hls) return callback();
+  if (hlsScriptLoaded) return;
+  hlsScriptLoaded = true;
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js';
+  s.onload = callback;
+  document.head.appendChild(s);
+}
+
+/* ============ RENDER CHIPS ============ */
+function renderChips() {
+  const cats = ["All", ...new Set(CHANNELS.map(c => c.cat))];
+  const wrap = document.getElementById('chips');
+  wrap.innerHTML = cats.map(c =>
+    `<div class="chip ${c === activeCat ? 'active' : ''}" data-cat="${c}">${c}</div>`
+  ).join('');
+  wrap.querySelectorAll('.chip').forEach(chip => {
+    chip.onclick = () => {
+      activeCat = chip.dataset.cat;
+      renderChips();
+      renderGrid();
+    };
+  });
+}
+
+/* ============ RENDER GRID ============ */
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const list = CHANNELS.filter(c => {
+    const matchCat = activeCat === "All" || c.cat === activeCat;
+    const matchSearch = c.name.toLowerCase().includes(searchTerm) ||
+                        c.cat.toLowerCase().includes(searchTerm);
+    return matchCat && matchSearch;
+  });
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty"><div>🔍</div>No channels found.<br>Try a different search or category.</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map((c, i) => `
+    <div class="card" data-idx="${CHANNELS.indexOf(c)}">
+      <div class="card-thumb">
+        ${c.icon}
+        <div class="card-live">LIVE</div>
+        <div class="play-overlay"><span>▶</span></div>
+      </div>
+      <div class="card-info">
+        <h3>${c.name}</h3>
+        <p><span class="cat-tag">${c.cat}</span> • HD</p>
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.card').forEach(card => {
+    card.onclick = () => openPlayer(CHANNELS[card.dataset.idx]);
+  });
+}
+
+/* ============ PLAYER ============ */
+let currentHls = null;
+function openPlayer(ch) {
+  document.getElementById('playerTitle').textContent = ch.icon + ' ' + ch.name;
+  document.getElementById('playerCat').textContent = '📁 ' + ch.cat;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  const video = document.getElementById('video');
+  if (currentHls) { currentHls.destroy(); currentHls = null; }
+
+  const url = ch.url;
+  const isHls = url.includes('.m3u8');
+
+  // Native HLS (Safari / iOS)
+  if (isHls && video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = url;
+    video.play().catch(()=>{});
+    return;
+  }
+
+  // hls.js for Chrome / Firefox / Edge
+  if (isHls) {
+    loadHls(() => {
+      if (Hls.isSupported()) {
+        currentHls = new Hls({ enableWorker: true, lowLatencyMode: true });
+        currentHls.loadSource(url);
+        currentHls.attachMedia(video);
+        currentHls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(()=>{}));
+      } else {
+        video.src = url;
+      }
+    });
+  } else {
+    video.src = url;
+    video.play().catch(()=>{});
+  }
+}
+
+function closePlayer() {
+  const video = document.getElementById('video');
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+  if (currentHls) { currentHls.destroy(); currentHls = null; }
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close on background click / ESC
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target.id === 'modal') closePlayer();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayer(); });
+
+/* ============ SEARCH ============ */
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchTerm = e.target.value.trim().toLowerCase();
+  renderGrid();
+});
+
+/* ============ INIT ============ */
+renderChips();
+renderGrid();
+</script>
+</body>
+</html>
