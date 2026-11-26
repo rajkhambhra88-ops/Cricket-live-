@@ -3,84 +3,145 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CricFy TV - वैश्विक मुफ्त चैनल</title>
+<title>CricFy TV - विश्व के मुफ्त चैनल</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
     --bg: #0a0e1a; --bg-2: #121829; --card: #1a2236; --card-hover: #232d47;
     --accent: #ff4757; --accent-2: #ff6b81; --text: #e8edf5; --text-dim: #8892b0;
-    --radius: 14px;
+    --gold: #ffd166; --green: #2ecc71; --radius: 14px;
   }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-  header { position: sticky; top: 0; z-index: 100; background: rgba(10,14,26,.92); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,.06); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
-  .logo { display: flex; align-items: center; gap: 10px; font-size: 1.35rem; font-weight: 800; }
-  .logo-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: grid; place-items: center; font-size: 20px; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ===== हेडर ===== */
+  header { position: sticky; top: 0; z-index: 100; background: rgba(10,14,26,.95); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,.06); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 800; }
+  .logo-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: grid; place-items: center; font-size: 20px; box-shadow: 0 4px 16px rgba(255,71,87,.4); }
   .logo span { color: var(--accent); }
-  .search-box { flex: 1; max-width: 380px; position: relative; }
-  .search-box input { width: 100%; padding: 11px 16px 11px 42px; background: var(--card); border: 1px solid rgba(255,255,255,.08); border-radius: 30px; color: var(--text); font-size: .92rem; outline: none; }
-  .search-box input:focus { border-color: var(--accent); }
-  .search-box::before { content: '🔍'; position: absolute; left: 15px; top: 50%; transform: translateY(-50%); opacity: .6; }
-  .filters { display: flex; gap: 10px; padding: 16px 20px 6px; flex-wrap: wrap; align-items: center; }
-  .chips { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; flex: 1; padding-bottom: 4px; }
-  .chips::-webkit-scrollbar { display: none; }
-  .chip { flex-shrink: 0; padding: 8px 18px; border-radius: 30px; background: var(--card); border: 1px solid rgba(255,255,255,.08); color: var(--text-dim); font-size: .84rem; font-weight: 600; cursor: pointer; transition: .2s; user-select: none; }
+  .search-box { flex: 1; max-width: 360px; position: relative; }
+  .search-box input { width: 100%; padding: 10px 16px 10px 40px; background: var(--card); border: 1px solid rgba(255,255,255,.08); border-radius: 30px; color: var(--text); font-size: .9rem; outline: none; transition: .25s; }
+  .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,71,87,.15); }
+  .search-box::before { content: '🔍'; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: .6; font-size: 14px; }
+
+  /* ===== स्वागत स्क्रीन ===== */
+  .welcome { margin: 24px 20px 0; padding: 40px 30px; border-radius: 22px; background: linear-gradient(135deg, #1e2740 0%, #2a1f3d 55%, #3d1e2b 100%); position: relative; overflow: hidden; }
+  .welcome::after { content: ''; position: absolute; right: -80px; top: -80px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,71,87,.4), transparent 70%); }
+  .welcome h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); margin-bottom: 10px; position: relative; }
+  .welcome p { color: var(--text-dim); max-width: 600px; font-size: 1rem; line-height: 1.6; position: relative; }
+  .welcome-stats { display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+  .stat { display: flex; flex-direction: column; }
+  .stat .num { font-size: 1.5rem; font-weight: 800; color: var(--gold); }
+  .stat .label { font-size: .8rem; color: var(--text-dim); }
+
+  /* ===== फ़िल्टर बार ===== */
+  .filter-bar { padding: 20px 20px 0; display: flex; flex-direction: column; gap: 14px; }
+  .filter-row { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; align-items: center; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-label { font-size: .78rem; color: var(--text-dim); font-weight: 700; flex-shrink: 0; min-width: 60px; }
+  .chip { flex-shrink: 0; padding: 8px 18px; border-radius: 30px; background: var(--card); border: 1px solid rgba(255,255,255,.08); color: var(--text-dim); font-size: .84rem; font-weight: 600; cursor: pointer; transition: .2s; user-select: none; white-space: nowrap; }
   .chip:hover { color: var(--text); background: var(--card-hover); }
-  .chip.active { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; border-color: transparent; }
-  .lang-wrap { display: flex; align-items: center; gap: 8px; }
-  .lang-wrap select { padding: 9px 16px; border-radius: 30px; background: var(--card); color: var(--text); border: 1px solid rgba(255,255,255,.1); font-size: .84rem; outline: none; cursor: pointer; }
-  .grid { display: grid; gap: 16px; padding: 10px 20px 40px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
-  .card { background: var(--card); border-radius: var(--radius); overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,.06); transition: .25s; }
-  .card:hover { transform: translateY(-5px); border-color: rgba(255,71,87,.45); }
-  .card-thumb { aspect-ratio: 16/10; display: grid; place-items: center; font-size: 2.4rem; position: relative; background: linear-gradient(135deg, #232d47, #1a2236); }
+  .chip.active { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; border-color: transparent; box-shadow: 0 4px 14px rgba(255,71,87,.3); }
+  select.filter-select { padding: 8px 16px; border-radius: 30px; background: var(--card); color: var(--text); border: 1px solid rgba(255,255,255,.1); font-size: .84rem; outline: none; cursor: pointer; flex-shrink: 0; }
+
+  /* ===== ग्रिड ===== */
+  .section-title { padding: 24px 20px 12px; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 9px; }
+  .section-title::before { content: ''; width: 4px; height: 20px; border-radius: 4px; background: linear-gradient(var(--accent), var(--accent-2)); }
+  .grid { display: grid; gap: 16px; padding: 0 20px 40px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+  .card { background: var(--card); border-radius: var(--radius); overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,.06); transition: .25s cubic-bezier(.4,0,.2,1); position: relative; }
+  .card:hover { transform: translateY(-5px); border-color: rgba(255,71,87,.45); box-shadow: 0 12px 32px rgba(0,0,0,.45); }
+  .card-thumb { aspect-ratio: 16/10; display: grid; place-items: center; font-size: 2.4rem; position: relative; background: linear-gradient(135deg, #232d47, #1a2236); overflow: hidden; }
   .card-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
-  .card-live { position: absolute; top: 10px; left: 10px; background: var(--accent); color: #fff; font-size: .65rem; font-weight: 800; padding: 3px 9px; border-radius: 6px; }
-  .card-info { padding: 12px 14px; }
-  .card-info h3 { font-size: .9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .card-info p { font-size: .75rem; color: var(--text-dim); margin-top: 4px; }
-  .cat-tag { background: rgba(255,71,87,.12); color: var(--accent); padding: 2px 8px; border-radius: 5px; font-size: .68rem; font-weight: 700; }
-  .empty { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-dim); }
-  .empty div { font-size: 3rem; margin-bottom: 10px; }
-  .modal { position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,.92); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 16px; }
+  .card-live { position: absolute; top: 10px; left: 10px; background: var(--accent); color: #fff; font-size: .62rem; font-weight: 800; padding: 3px 9px; border-radius: 6px; letter-spacing: .5px; }
+  .card-live::before { content: ''; display: inline-block; width: 5px; height: 5px; background: #fff; border-radius: 50%; margin-right: 4px; animation: blink 1.2s infinite; }
+  @keyframes blink { 50% { opacity: .3; } }
+  .card-info { padding: 12px 14px 14px; }
+  .card-info h3 { font-size: .9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px; }
+  .card-info p { font-size: .72rem; color: var(--text-dim); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .tag { background: rgba(255,71,87,.12); color: var(--accent); padding: 2px 8px; border-radius: 5px; font-size: .65rem; font-weight: 700; }
+  .tag-country { background: rgba(255,209,102,.12); color: var(--gold); padding: 2px 8px; border-radius: 5px; font-size: .65rem; font-weight: 700; }
+
+  /* ===== लोड मोर ===== */
+  .load-more-wrap { grid-column: 1/-1; text-align: center; padding: 20px; }
+  .load-more-wrap button { padding: 12px 36px; border-radius: 30px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; border: none; font-weight: 700; font-size: .9rem; cursor: pointer; box-shadow: 0 6px 20px rgba(255,71,87,.35); transition: .2s; }
+  .load-more-wrap button:hover { transform: translateY(-2px); }
+
+  /* ===== खाली स्थिति ===== */
+  .empty { grid-column: 1/-1; text-align: center; padding: 70px 20px; color: var(--text-dim); }
+  .empty .icon { font-size: 3.5rem; margin-bottom: 12px; }
+
+  /* ===== प्लेयर ===== */
+  .modal { position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,.94); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; padding: 16px; }
   .modal.open { display: flex; }
-  .player-box { width: 100%; max-width: 1000px; background: var(--bg-2); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); }
+  .player-box { width: 100%; max-width: 1000px; background: var(--bg-2); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); box-shadow: 0 20px 60px rgba(0,0,0,.8); }
   .player-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,.06); }
-  .player-head h3 { font-size: 1rem; }
-  .close-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(255,255,255,.08); color: var(--text); font-size: 18px; cursor: pointer; }
+  .player-head h3 { font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+  .close-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(255,255,255,.08); color: var(--text); font-size: 18px; cursor: pointer; transition: .2s; flex-shrink: 0; }
   .close-btn:hover { background: var(--accent); }
   .video-wrap { aspect-ratio: 16/9; background: #000; }
   .video-wrap video { width: 100%; height: 100%; display: block; }
-  .load-more-wrap { grid-column: 1/-1; text-align: center; padding: 20px; }
-  .load-more-wrap button { padding: 10px 30px; border-radius: 30px; background: var(--accent); color: #fff; border: none; font-weight: 700; cursor: pointer; }
-  footer { text-align: center; padding: 28px 20px 40px; color: var(--text-dim); font-size: .8rem; line-height: 1.7; border-top: 1px solid rgba(255,255,255,.06); }
+
+  /* ===== फुटर ===== */
+  footer { text-align: center; padding: 28px 20px 40px; color: var(--text-dim); font-size: .8rem; line-height: 1.8; border-top: 1px solid rgba(255,255,255,.06); }
+  footer .note { max-width: 720px; margin: 10px auto 0; font-size: .72rem; opacity: .65; }
+
+  /* ===== स्क्रॉलबार ===== */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--card-hover); border-radius: 10px; }
+
+  /* ===== रिस्पॉन्सिव ===== */
   @media (max-width: 640px) {
-    header { padding: 12px 14px; }
+    header { padding: 10px 14px; }
     .search-box { order: 3; flex-basis: 100%; max-width: 100%; }
-    .filters { padding: 12px 14px 4px; }
-    .grid { padding: 10px 14px 30px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .welcome { margin: 16px 14px 0; padding: 28px 22px; }
+    .filter-bar { padding: 16px 14px 0; }
+    .grid { padding: 0 14px 30px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .section-title { padding: 18px 14px 10px; }
+    .card-thumb { font-size: 2rem; }
   }
 </style>
 </head>
 <body>
 
+<!-- ===== हेडर ===== -->
 <header>
   <div class="logo"><div class="logo-icon">📺</div>Cric<span>Fy</span></div>
   <div class="search-box"><input type="text" id="searchInput" placeholder="चैनल खोजें..."></div>
 </header>
 
-<div class="filters">
-  <div class="chips" id="chips"></div>
-  <div class="lang-wrap">
-    <select id="langSelect">
-      <option value="All">सभी भाषाएं</option>
-    </select>
+<!-- ===== स्वागत स्क्रीन ===== -->
+<div class="welcome" id="welcomeScreen">
+  <h1>🌍 दुनिया भर के मुफ्त चैनल</h1>
+  <p>10,000+ सार्वजनिक रूप से उपलब्ध Free-to-Air चैनल। समाचार, खेल, फिल्में, मनोरंजन, डॉक्यूमेंट्री — सब कुछ एक जगह।</p>
+  <div class="welcome-stats">
+    <div class="stat"><span class="num" id="totalCount">0</span><span class="label">कुल चैनल</span></div>
+    <div class="stat"><span class="num" id="catCount">0</span><span class="label">श्रेणियाँ</span></div>
+    <div class="stat"><span class="num" id="countryCount">0</span><span class="label">देश</span></div>
   </div>
 </div>
 
-<div class="grid" id="grid">
-  <div class="empty"><div>⏳</div>श्रेणियाँ लोड हो रही हैं...</div>
+<!-- ===== फ़िल्टर ===== -->
+<div class="filter-bar">
+  <div class="filter-row">
+    <span class="filter-label">श्रेणी</span>
+    <div id="chips" style="display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;"></div>
+  </div>
+  <div class="filter-row">
+    <span class="filter-label">भाषा</span>
+    <select class="filter-select" id="langSelect"><option value="All">सभी भाषाएं</option></select>
+    <span class="filter-label" style="margin-left:10px;">देश</span>
+    <select class="filter-select" id="countrySelect"><option value="All">सभी देश</option></select>
+  </div>
 </div>
 
+<!-- ===== चैनल ग्रिड ===== -->
+<div class="section-title" id="sectionTitle">लोकप्रिय चैनल</div>
+<div class="grid" id="grid">
+  <div class="empty"><div class="icon">⏳</div>डेटा लोड हो रहा है...</div>
+</div>
+
+<!-- ===== प्लेयर मोडल ===== -->
 <div class="modal" id="modal">
   <div class="player-box">
     <div class="player-head">
@@ -91,11 +152,10 @@
   </div>
 </div>
 
+<!-- ===== फुटर ===== -->
 <footer>
-  <div>© 2024 CricFy TV</div>
-  <div style="font-size:.72rem;opacity:.7;max-width:700px;margin:8px auto 0;">
-    ⚠️ केवल सार्वजनिक रूप से उपलब्ध Free-to-Air (FTA) स्ट्रीम। कोई कॉपीराइट सामग्री होस्ट या वितरित नहीं की जाती।
-  </div>
+  <div>© 2026 CricFy TV</div>
+  <div class="note">⚠️ केवल सार्वजनिक Free-to-Air (FTA) स्ट्रीम। कोई कॉपीराइट सामग्री होस्ट या वितरित नहीं की जाती। सभी ट्रेडमार्क उनके स्वामियों की संपत्ति हैं।</div>
 </footer>
 
 <script>
@@ -104,172 +164,233 @@ let ALL_CHANNELS = [];
 let ALL_CATEGORIES = [];
 let STREAM_MAP = {};
 let LANG_MAP = {};
-let activeCategory = null;
+let COUNTRY_MAP = {};
+let activeCategory = 'popular';
 let activeLanguage = 'All';
+let activeCountry = 'All';
 let searchTerm = '';
 const PAGE_SIZE = 80;
+
+// लोकप्रिय चैनलों के नाम (इन्हें प्राथमिकता से दिखाया जाएगा)
+const POPULAR_NAMES = ['discovery', 'national geographic', 'bbc', 'cnn', 'al jazeera', 'dw', 'france 24', 'sky news', 'ndtv', 'aaj tak', 'geo', 'ary', 'somoy', 'channel i', 'star', 'sony', 'espn', 'eurosport'];
 
 // ==================== प्रारंभ ====================
 async function initApp() {
   const grid = document.getElementById('grid');
-  grid.innerHTML = `<div class="empty"><div>⏳</div>वैश्विक चैनल डेटा लोड हो रहा है...</div>`;
+  grid.innerHTML = `<div class="empty"><div class="icon">⏳</div>वैश्विक चैनल डेटा लोड हो रहा है...</div>`;
 
   try {
-    const [channelsRes, categoriesRes, streamsRes, langsRes] = await Promise.all([
+    const [channelsRes, categoriesRes, streamsRes, langsRes, countriesRes] = await Promise.all([
       fetch('https://iptv-org.github.io/api/channels.json'),
       fetch('https://iptv-org.github.io/api/categories.json'),
       fetch('https://iptv-org.github.io/api/streams.json'),
-      fetch('https://iptv-org.github.io/api/languages.json')
+      fetch('https://iptv-org.github.io/api/languages.json'),
+      fetch('https://iptv-org.github.io/api/countries.json')
     ]);
 
     const channelsData = await channelsRes.json();
     const categoriesData = await categoriesRes.json();
     const streamsData = await streamsRes.json();
     const langsData = await langsRes.json();
+    const countriesData = await countriesRes.json();
 
-    // स्ट्रीम मैपिंग
-    streamsData.forEach(s => {
-      if (s.channel && !STREAM_MAP[s.channel]) STREAM_MAP[s.channel] = s.url;
-    });
-
-    // भाषा मैपिंग (कोड -> नाम)
+    // मैपिंग
+    streamsData.forEach(s => { if (s.channel && !STREAM_MAP[s.channel]) STREAM_MAP[s.channel] = s.url; });
     langsData.forEach(l => { LANG_MAP[l.code] = l.name; });
+    countriesData.forEach(c => { COUNTRY_MAP[c.code] = { name: c.name, flag: c.flag || '' }; });
 
-    // चैनल डेटा को मर्ज और फ़िल्टर करें (केवल स्ट्रीम और श्रेणी वाले रखें)
+    // चैनल डेटा मर्ज करें
     ALL_CHANNELS = channelsData
       .filter(ch => STREAM_MAP[ch.id] && ch.categories && ch.categories.length > 0)
       .map(ch => ({
-        id: ch.id,
-        name: ch.name,
-        icon: ch.logo || '📺',
-        categories: ch.categories,
-        languages: ch.languages || [],
+        id: ch.id, name: ch.name, icon: ch.logo || '📺',
+        categories: ch.categories, languages: ch.languages || [],
         languageNames: (ch.languages || []).map(c => LANG_MAP[c] || c),
-        url: STREAM_MAP[ch.id]
+        country: ch.country || null,
+        countryName: COUNTRY_MAP[ch.country]?.name || '',
+        countryFlag: COUNTRY_MAP[ch.country]?.flag || '🌍',
+        url: STREAM_MAP[ch.id],
+        isPopular: POPULAR_NAMES.some(p => ch.name.toLowerCase().includes(p))
       }));
 
-    // केवल उन श्रेणियों को रखें जिनमें वास्तव में चैनल हैं
+    // श्रेणियाँ (केवल जिनमें चैनल हों)
     const catSet = new Set();
     ALL_CHANNELS.forEach(ch => ch.categories.forEach(c => catSet.add(c)));
     ALL_CATEGORIES = categoriesData.filter(c => catSet.has(c.id));
 
-    // भाषा विकल्प लोड करें
+    // आँकड़े
+    document.getElementById('totalCount').textContent = ALL_CHANNELS.length.toLocaleString();
+    document.getElementById('catCount').textContent = ALL_CATEGORIES.length;
+    document.getElementById('countryCount').textContent = new Set(ALL_CHANNELS.map(c => c.country).filter(Boolean)).size;
+
+    // फ़िल्टर लोड करें
+    loadCategoryChips();
     loadLanguageOptions(langsData);
+    loadCountryOptions(countriesData);
 
-    // श्रेणी चिप्स रेंडर करें
-    renderCategoryChips();
-
-    grid.innerHTML = `<div class="empty"><div>👆</div>कृपया ऊपर एक श्रेणी चुनें</div>`;
+    // लोकप्रिय चैनल दिखाएं
+    showPopular();
 
   } catch (err) {
     console.error(err);
-    grid.innerHTML = `<div class="empty"><div>😵</div>लोड विफल, कृपया रीफ्रेश करें<br><small>${err.message}</small></div>`;
+    grid.innerHTML = `<div class="empty"><div class="icon">😵</div>लोड विफल: ${err.message}<br>कृपया रीफ्रेश करें</div>`;
   }
 }
 
-// ==================== भाषा विकल्प लोड करें ====================
-function loadLanguageOptions(langsData) {
-  const select = document.getElementById('langSelect');
-  // केवल सामान्य भाषाएं दिखाएं (सभी दिखाने पर बहुत अधिक होंगी)
-  const commonCodes = ['hin','eng','urd','ben','tam','tel','mal','kan','mar','guj','pan','ara','fra','spa','por','rus','ind','zho','jpn','kor'];
-  const hiNames = { hin:'हिंदी', eng:'अंग्रेज़ी', urd:'उर्दू', ben:'बंगाली', tam:'तमिल', tel:'तेलुगु', mal:'मलयालम', kan:'कन्नड़', mar:'मराठी', guj:'गुजराती', pan:'पंजाबी', ara:'अरबी', fra:'फ्रेंच', spa:'स्पेनिश', por:'पुर्तगाली', rus:'रूसी', ind:'इंडोनेशियाई', zho:'चीनी', jpn:'जापानी', kor:'कोरियाई' };
-
-  let html = '<option value="All">सभी भाषाएं</option>';
-  commonCodes.forEach(code => {
-    const found = langsData.find(l => l.code === code);
-    if (found) {
-      html += `<option value="${code}">${hiNames[code] || found.name}</option>`;
-    }
-  });
-  select.innerHTML = html;
-
-  select.onchange = (e) => {
-    activeLanguage = e.target.value;
-    if (activeCategory) renderGridForCategory(activeCategory);
-  };
-}
-
-// ==================== श्रेणी चिप्स रेंडर करें ====================
-function renderCategoryChips() {
+// ==================== श्रेणी चिप्स ====================
+function loadCategoryChips() {
   const wrap = document.getElementById('chips');
   const hiNames = {
     'sports':'खेल','news':'समाचार','movies':'फिल्में','music':'संगीत',
     'kids':'बच्चे','entertainment':'मनोरंजन','documentary':'डॉक्यूमेंट्री',
-    'general':'सामान्य','comedy':'कॉमेडी','education':'शिक्षा','religious':'धार्मिक'
+    'general':'सामान्य','comedy':'कॉमेडी','education':'शिक्षा','religious':'धार्मिक',
+    'series':'सीरीज़','animation':'एनिमेशन','culture':'संस्कृति','family':'परिवार',
+    'lifestyle':'लाइफस्टाइल','outdoor':'आउटडोर','science':'विज्ञान','travel':'यात्रा'
   };
 
-  wrap.innerHTML = ALL_CATEGORIES.map(cat => {
+  let html = `<div class="chip ${activeCategory==='popular'?'active':''}" data-cat="popular">🔥 लोकप्रिय</div>`;
+  html += ALL_CATEGORIES.map(cat => {
     const name = hiNames[cat.id] || cat.name;
     const active = activeCategory === cat.id ? 'active' : '';
     return `<div class="chip ${active}" data-cat="${cat.id}">${name}</div>`;
   }).join('');
+  wrap.innerHTML = html;
 
   wrap.querySelectorAll('.chip').forEach(chip => {
     chip.onclick = () => {
       wrap.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       activeCategory = chip.dataset.cat;
-      renderGridForCategory(activeCategory);
+      renderChannels();
     };
   });
 }
 
-// ==================== श्रेणी के अनुसार ग्रिड रेंडर करें ====================
-function renderGridForCategory(catId) {
+// ==================== भाषा विकल्प ====================
+function loadLanguageOptions(langsData) {
+  const select = document.getElementById('langSelect');
+  const common = ['hin','eng','urd','ben','tam','tel','mal','kan','mar','guj','pan','ara','fra','spa','por','rus','zho','jpn','kor','deu','ita','tur','ind','tha','vie'];
+  const hi = { hin:'हिंदी', eng:'अंग्रेज़ी', urd:'उर्दू', ben:'बंगाली', tam:'तमिल', tel:'तेलुगु', mal:'मलयालम', kan:'कन्नड़', mar:'मराठी', guj:'गुजराती', pan:'पंजाबी', ara:'अरबी', fra:'फ्रेंच', spa:'स्पेनिश', por:'पुर्तगाली', rus:'रूसी', zho:'चीनी', jpn:'जापानी', kor:'कोरियाई', deu:'जर्मन', ita:'इतालवी', tur:'तुर्की', ind:'इंडोनेशियाई', tha:'थाई', vie:'वियतनामी' };
+
+  let html = '<option value="All">सभी भाषाएं</option>';
+  common.forEach(code => {
+    const found = langsData.find(l => l.code === code);
+    if (found && ALL_CHANNELS.some(ch => ch.languages.includes(code))) {
+      html += `<option value="${code}">${hi[code] || found.name}</option>`;
+    }
+  });
+  select.innerHTML = html;
+  select.onchange = (e) => { activeLanguage = e.target.value; renderChannels(); };
+}
+
+// ==================== देश विकल्प ====================
+function loadCountryOptions(countriesData) {
+  const select = document.getElementById('countrySelect');
+  const countrySet = new Set(ALL_CHANNELS.map(c => c.country).filter(Boolean));
+  const available = countriesData.filter(c => countrySet.has(c.code));
+  // लोकप्रिय देश पहले
+  const priority = ['IN','PK','BD','US','GB','AE','SA','CA','AU'];
+  available.sort((a,b) => {
+    const ai = priority.indexOf(a.code), bi = priority.indexOf(b.code);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  let html = '<option value="All">सभी देश</option>';
+  available.forEach(c => {
+    html += `<option value="${c.code}">${c.flag || ''} ${c.name}</option>`;
+  });
+  select.innerHTML = html;
+  select.onchange = (e) => { activeCountry = e.target.value; renderChannels(); };
+}
+
+// ==================== लोकप्रिय चैनल ====================
+function showPopular() {
+  document.getElementById('sectionTitle').textContent = '🔥 लोकप्रिय चैनल';
   const grid = document.getElementById('grid');
-  let filtered = ALL_CHANNELS.filter(ch => ch.categories.includes(catId));
+  const popular = ALL_CHANNELS.filter(ch => ch.isPopular).slice(0, 24);
+
+  if (popular.length === 0) {
+    // अगर कोई लोकप्रिय नहीं मिला तो पहले 24 दिखाएं
+    renderList(ALL_CHANNELS.slice(0, 24));
+    return;
+  }
+  renderList(popular);
+}
+
+// ==================== चैनल रेंडर करें ====================
+function renderChannels() {
+  const grid = document.getElementById('grid');
+  let list = ALL_CHANNELS;
+
+  // श्रेणी फ़िल्टर
+  if (activeCategory !== 'popular') {
+    list = list.filter(ch => ch.categories.includes(activeCategory));
+    const hiNames = { 'sports':'खेल','news':'समाचार','movies':'फिल्में','music':'संगीत','kids':'बच्चे','entertainment':'मनोरंजन','documentary':'डॉक्यूमेंट्री','general':'सामान्य','comedy':'कॉमेडी','education':'शिक्षा','religious':'धार्मिक','series':'सीरीज़','animation':'एनिमेशन' };
+    document.getElementById('sectionTitle').textContent = (hiNames[activeCategory] || activeCategory) + ' चैनल';
+  } else {
+    // लोकप्रिय + सभी
+    document.getElementById('sectionTitle').textContent = '🔥 लोकप्रिय चैनल';
+    const popular = list.filter(ch => ch.isPopular);
+    const others = list.filter(ch => !ch.isPopular);
+    list = [...popular, ...others];
+  }
 
   // भाषा फ़िल्टर
-  if (activeLanguage !== 'All') {
-    filtered = filtered.filter(ch => ch.languages.includes(activeLanguage));
-  }
+  if (activeLanguage !== 'All') list = list.filter(ch => ch.languages.includes(activeLanguage));
+  // देश फ़िल्टर
+  if (activeCountry !== 'All') list = list.filter(ch => ch.country === activeCountry);
+  // खोज
+  if (searchTerm) list = list.filter(ch => ch.name.toLowerCase().includes(searchTerm));
 
-  // खोज फ़िल्टर
-  if (searchTerm) {
-    filtered = filtered.filter(ch => ch.name.toLowerCase().includes(searchTerm));
-  }
-
-  if (filtered.length === 0) {
-    grid.innerHTML = `<div class="empty"><div>🔍</div>कोई मेल खाता चैनल नहीं मिला</div>`;
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="empty"><div class="icon">🔍</div>कोई चैनल नहीं मिला।<br>फ़िल्टर बदलें या खोजें।</div>`;
     return;
   }
 
   // पेजिनेशन
-  const display = filtered.slice(0, PAGE_SIZE);
-  grid.innerHTML = display.map(ch => cardHTML(ch, catId)).join('');
+  const display = list.slice(0, PAGE_SIZE);
+  grid.innerHTML = display.map(ch => cardHTML(ch)).join('');
 
-  // और लोड करें बटन
-  if (filtered.length > PAGE_SIZE) {
+  if (list.length > PAGE_SIZE) {
     const wrap = document.createElement('div');
     wrap.className = 'load-more-wrap';
-    wrap.innerHTML = `<button>और लोड करें (${filtered.length - PAGE_SIZE} शेष)</button>`;
+    wrap.innerHTML = `<button>और लोड करें (${list.length - PAGE_SIZE} शेष)</button>`;
     grid.appendChild(wrap);
     wrap.querySelector('button').onclick = () => {
-      const rest = filtered.slice(PAGE_SIZE);
+      const rest = list.slice(PAGE_SIZE);
       wrap.remove();
-      grid.insertAdjacentHTML('beforeend', rest.map(ch => cardHTML(ch, catId)).join(''));
-      bindCardClicks();
+      grid.insertAdjacentHTML('beforeend', rest.map(ch => cardHTML(ch)).join(''));
+      bindClicks();
     };
   }
-
-  bindCardClicks();
+  bindClicks();
 }
 
-function cardHTML(ch, catId) {
+function renderList(list) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = list.map(ch => cardHTML(ch)).join('');
+  bindClicks();
+}
+
+function cardHTML(ch) {
   const icon = ch.icon.startsWith('http')
-    ? `<img src="${ch.icon}" alt="${ch.name}" loading="lazy">`
+    ? `<img src="${ch.icon}" alt="${ch.name}" loading="lazy" onerror="this.style.display='none'">`
     : ch.icon;
+  const catName = ch.categories[0] || 'general';
   return `
     <div class="card" data-id="${ch.id}">
       <div class="card-thumb">${icon}<div class="card-live">LIVE</div></div>
       <div class="card-info">
         <h3>${ch.name}</h3>
-        <p><span class="cat-tag">${catId}</span> ${ch.languageNames[0] || ''}</p>
+        <p><span class="tag">${catName}</span> <span class="tag-country">${ch.countryFlag} ${ch.countryName||''}</span></p>
       </div>
     </div>`;
 }
 
-function bindCardClicks() {
+function bindClicks() {
   document.querySelectorAll('.card').forEach(card => {
     card.onclick = () => {
       const ch = ALL_CHANNELS.find(c => c.id === card.dataset.id);
@@ -291,41 +412,36 @@ function openPlayer(ch) {
 
   if (ch.url.includes('.m3u8')) {
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = ch.url;
-      video.play().catch(()=>{});
+      video.src = ch.url; video.play().catch(()=>{});
     } else if (typeof Hls !== 'undefined' && Hls.isSupported()) {
       currentHls = new Hls({ enableWorker: true, lowLatencyMode: true });
       currentHls.loadSource(ch.url);
       currentHls.attachMedia(video);
       currentHls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(()=>{}));
-    } else {
-      video.src = ch.url;
-    }
-  } else {
-    video.src = ch.url;
-    video.play().catch(()=>{});
-  }
+      currentHls.on(Hls.Events.ERROR, (e, data) => { if (data.fatal) console.log('HLS error:', data.type); });
+    } else { video.src = ch.url; }
+  } else { video.src = ch.url; video.play().catch(()=>{}); }
 }
 
 function closePlayer() {
   const video = document.getElementById('video');
-  video.pause();
-  video.removeAttribute('src');
-  video.load();
+  video.pause(); video.removeAttribute('src'); video.load();
   if (currentHls) { currentHls.destroy(); currentHls = null; }
   document.getElementById('modal').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-document.getElementById('modal').addEventListener('click', e => {
-  if (e.target.id === 'modal') closePlayer();
-});
+document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closePlayer(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayer(); });
 
 // ==================== खोज ====================
+let searchTimer;
 document.getElementById('searchInput').addEventListener('input', e => {
-  searchTerm = e.target.value.trim().toLowerCase();
-  if (activeCategory) renderGridForCategory(activeCategory);
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    searchTerm = e.target.value.trim().toLowerCase();
+    renderChannels();
+  }, 300);
 });
 
 // ==================== प्रारंभ ====================
