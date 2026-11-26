@@ -10,7 +10,7 @@
   :root {
     --bg: #0a0e1a; --bg-2: #121829; --card: #1a2236; --card-hover: #232d47;
     --accent: #ff4757; --accent-2: #ff6b81; --text: #e8edf5; --text-dim: #8892b0;
-    --gold: #ffd166; --green: #2ecc71; --radius: 14px;
+    --gold: #ffd166; --radius: 14px;
   }
   body { font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
@@ -90,10 +90,10 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   
   /* एरर मैसेज */
-  .error-msg { position: absolute; z-index: 2; text-align: center; display: none; padding: 20px; background: rgba(0,0,0,.8); border-radius: 12px; }
+  .error-msg { position: absolute; z-index: 2; text-align: center; display: none; padding: 20px; background: rgba(0,0,0,.8); border-radius: 12px; width: 90%; max-width: 400px; }
   .error-msg.show { display: block; }
   .error-msg .err-icon { font-size: 2.5rem; margin-bottom: 10px; }
-  .error-msg p { color: var(--text); font-size: 1rem; margin-bottom: 15px; }
+  .error-msg p { color: var(--text); font-size: .95rem; margin-bottom: 15px; line-height: 1.5; }
   .yt-btn { display: inline-block; background: #ff0000; color: #fff; text-decoration: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: .9rem; }
 
   /* ===== फुटर ===== */
@@ -199,32 +199,40 @@ let activeCountry = 'All';
 let searchTerm = '';
 const PAGE_SIZE = 80;
 
-// लोकप्रिय चैनलों के नाम
 const POPULAR_NAMES = ['discovery', 'national geographic', 'bbc', 'cnn', 'al jazeera', 'dw', 'france 24', 'sky news', 'ndtv', 'aaj tak', 'geo', 'ary', 'somoy', 'channel i', 'star', 'sony', 'espn', 'eurosport'];
 
 // ==================== प्रारंभ ====================
 async function initApp() {
   const grid = document.getElementById('grid');
-  grid.innerHTML = `<div class="empty"><div class="icon">⏳</div>वैश्विक चैनल डेटा लोड हो रहा है...</div>`;
+  grid.innerHTML = `<div class="empty"><div class="icon">⏳</div>वैश्विक चैनल डेटा लोड हो रहा है (इसमें 10-15 सेकंड लग सकते हैं)...</div>`;
 
   try {
-    // CORS प्रॉक्सी के साथ डेटा लोड करें ताकि हर ब्राउज़र में चले
-    const proxy = 'https://corsproxy.io/?';
+    // सीधे API कॉल (CORS प्रॉक्सी हटा दी गई है)
     const baseUrl = 'https://iptv-org.github.io/api/';
 
     const [channelsRes, categoriesRes, streamsRes, langsRes, countriesRes] = await Promise.all([
-      fetch(proxy + encodeURIComponent(baseUrl + 'channels.json')),
-      fetch(proxy + encodeURIComponent(baseUrl + 'categories.json')),
-      fetch(proxy + encodeURIComponent(baseUrl + 'streams.json')),
-      fetch(proxy + encodeURIComponent(baseUrl + 'languages.json')),
-      fetch(proxy + encodeURIComponent(baseUrl + 'countries.json'))
+      fetch(baseUrl + 'channels.json'),
+      fetch(baseUrl + 'categories.json'),
+      fetch(baseUrl + 'streams.json'),
+      fetch(baseUrl + 'languages.json'),
+      fetch(baseUrl + 'countries.json')
     ]);
+
+    // चेक करें कि रिस्पॉन्स ठीक है या नहीं
+    if (!channelsRes.ok || !streamsRes.ok) {
+      throw new Error("API सर्वर डाउन है या ब्लॉक है।");
+    }
 
     const channelsData = await channelsRes.json();
     const categoriesData = await categoriesRes.json();
     const streamsData = await streamsRes.json();
     const langsData = await langsRes.json();
     const countriesData = await countriesRes.json();
+
+    // सेफ्टी चेक: अगर डेटा ऑब्जेक्ट है (एरे नहीं), तो एरर दें
+    if (!Array.isArray(streamsData) || !Array.isArray(channelsData)) {
+      throw new Error("डेटा फॉर्मेट गलत है, कृपया बाद में प्रयास करें।");
+    }
 
     // मैपिंग
     streamsData.forEach(s => { if (s.channel && !STREAM_MAP[s.channel]) STREAM_MAP[s.channel] = s.url; });
@@ -245,7 +253,7 @@ async function initApp() {
         isPopular: POPULAR_NAMES.some(p => ch.name.toLowerCase().includes(p))
       }));
 
-    // श्रेणियाँ (केवल जिनमें चैनल हों)
+    // श्रेणियाँ
     const catSet = new Set();
     ALL_CHANNELS.forEach(ch => ch.categories.forEach(c => catSet.add(c)));
     ALL_CATEGORIES = categoriesData.filter(c => catSet.has(c.id));
@@ -265,7 +273,7 @@ async function initApp() {
 
   } catch (err) {
     console.error(err);
-    grid.innerHTML = `<div class="empty"><div class="icon">😵</div>डेटा लोड विफल: ${err.message}<br>कृपया इंटरनेट चेक करें या रीफ्रेश करें</div>`;
+    grid.innerHTML = `<div class="empty"><div class="icon">😵</div>डेटा लोड विफल: ${err.message}<br>कृपया रीफ्रेश करें या VPN का उपयोग करें।</div>`;
   }
 }
 
@@ -340,7 +348,6 @@ function loadCountryOptions(countriesData) {
 // ==================== लोकप्रिय चैनल ====================
 function showPopular() {
   document.getElementById('sectionTitle').textContent = '🔥 लोकप्रिय चैनल';
-  const grid = document.getElementById('grid');
   const popular = ALL_CHANNELS.filter(ch => ch.isPopular).slice(0, 24);
 
   if (popular.length === 0) {
@@ -438,7 +445,6 @@ function openPlayer(ch) {
   const errText = document.getElementById('errText');
   const ytContainer = document.getElementById('ytContainer');
 
-  // रीसेट करें
   if (currentHls) { currentHls.destroy(); currentHls = null; }
   clearTimeout(playTimeout);
   video.pause(); 
@@ -448,16 +454,14 @@ function openPlayer(ch) {
   errorMsg.classList.remove('show');
   ytContainer.innerHTML = '';
   loader.classList.add('show');
-  video.style.opacity = '0'; // वीडियो छिपाएं जब तक लोड न हो
+  video.style.opacity = '0';
 
   const url = ch.url;
 
-  // टाइमआउट सेट करें (10 सेकंड)
   playTimeout = setTimeout(() => {
     showError("इंटरनेट स्लो है या चैनल रिस्पॉन्ड नहीं कर रहा है।");
-  }, 10000);
+  }, 12000); // 12 सेकंड का टाइमआउट
 
-  // सक्सेस हैंडलर
   const onPlaySuccess = () => {
     clearTimeout(playTimeout);
     loader.classList.remove('show');
@@ -465,7 +469,6 @@ function openPlayer(ch) {
     errorMsg.classList.remove('show');
   };
 
-  // एरर हैंडलर
   const onError = (msg) => {
     clearTimeout(playTimeout);
     showError(msg);
@@ -477,21 +480,19 @@ function openPlayer(ch) {
     errorMsg.classList.add('show');
     errText.textContent = msg || "यह चैनल अभी उपलब्ध नहीं है";
 
-    // अगर YouTube लिंक है तो बटन दिखाएं
+    // YouTube लिंक डिटेक्शन
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
       ytContainer.innerHTML = `<a href="${url}" target="_blank" class="yt-btn">▶ YouTube पर देखें</a>`;
     }
   };
 
-  // वीडियो इवेंट्स
   video.onplaying = onPlaySuccess;
-  video.onerror = () => onError("स्ट्रीम फ़ॉर्मेट असमर्थित है या लिंक टूट गया है।");
+  video.onerror = () => onError("स्ट्रीम फ़ॉर्मेट असमर्थित है या लिंक काम नहीं कर रहा।");
 
-  // HLS लोडिंग
   if (url.includes('.m3u8')) {
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = url; 
-      video.play().catch(()=>{}); // iOS Safari
+      video.play().catch(()=>{});
     } else if (typeof Hls !== 'undefined' && Hls.isSupported()) {
       currentHls = new Hls({ enableWorker: true, lowLatencyMode: true });
       currentHls.loadSource(url);
@@ -520,7 +521,6 @@ function openPlayer(ch) {
       onError("आपका ब्राउज़र इस स्ट्रीम को सपोर्ट नहीं करता।");
     }
   } else {
-    // सीधा MP4 या अन्य लिंक
     video.src = url;
     video.play().catch(()=>{ onError("ऑटोप्ले ब्लॉक या अमान्य लिंक।"); });
   }
